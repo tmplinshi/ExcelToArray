@@ -23,3 +23,5 @@ Example of output array:
   ]
 ]
 ```
+
+Note: This function uses `sheet.Range(cell_begin, cell_end).FormulaR1C1` (instead of `.Value`) to read the data, it can avoids the numbers such as `1.2` converted into `1.200000`. But if your cells have formula, the formula code will be read, not the actual value.
