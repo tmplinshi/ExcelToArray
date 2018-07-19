@@ -1,4 +1,4 @@
-﻿; v1.0 (2018-6-22)
+﻿; v1.1 (2018-7-19)
 ; https://github.com/tmplinshi/ExcelToArray
 
 ExcelToArray(FileName, nSheet := 1, last_row := "", last_column := "")
@@ -21,15 +21,32 @@ class ExcelToArray
 	GetSafeArrFromXlFile(FileName, nSheet := 1, last_row := "", last_column := "")
 	{
 		fPath := this.GetFullPath(FileName)
-		bFileInUse := this.IsFileInUse(fPath)
 
-		xl := ComObjGet(fPath)
-		safeArr := this.GetSafeArr(xl, nSheet, last_row, last_column)
+		if this.IsFileInUse(fPath) {
+			try wb := this.GetWorkbook(fpath)
+		}
+		if !wb {
+			xlObj := ComObjCreate("Excel.Application")
+			xlObj.Workbooks.Open(fPath)
+			wb := xlObj.ActiveWorkbook
+		}
 
-		if !bFileInUse
-			xl.close()
+		safeArr := this.GetSafeArr(wb, nSheet, last_row, last_column)
+
+		xlObj.Quit
 
 		return safeArr
+	}
+
+	GetWorkbook(fPath)
+	{
+		xls := ComObjActive("Excel.Application")
+
+		Loop, % xls.WorkBooks.Count
+		{
+			if ( xls.WorkBooks(A_Index).FullName = fPath )
+			Return xls.WorkBooks(A_Index)
+		}
 	}
 
 	SafeArr_To_AHKArr(SafeArr)
@@ -52,15 +69,15 @@ class ExcelToArray
 		return ret
 	}
 
-	GetSafeArr(xl, nSheet := 1, last_row := "", last_column := "")
+	GetSafeArr(oWorkbook, nSheet := 1, last_row := "", last_column := "")
 	{
-		sheet := xl.Sheets(nSheet)
+		sheet := oWorkbook.Sheets(nSheet)
 
 		if last_row && last_column
 			lastCell := {row: last_row, column: last_column}
 		else
 		{
-			lastCell := this.xlFindLastCell(xl, nSheet)
+			lastCell := this.xlFindLastCell(oWorkbook, nSheet)
 			if last_row
 				lastCell.row := last_row
 			else if last_column
@@ -83,14 +100,14 @@ class ExcelToArray
 		return FileExist(FileName) && !FileOpen(FileName, "rw")
 	}
 
-	xlFindLastCell(xl, sheet := 1)
+	xlFindLastCell(oWorkbook, sheet := 1)
 	{
 		static xlByRows    := 1
 		     , xlByColumns := 2
 		     , xlPrevious  := 2
 
-		lastRow := xl.Sheets(sheet).Cells.Find("*", , , , xlByRows   , xlPrevious).Row
-		lastCol := xl.Sheets(sheet).Cells.Find("*", , , , xlByColumns, xlPrevious).Column
+		lastRow := oWorkbook.Sheets(sheet).Cells.Find("*", , , , xlByRows   , xlPrevious).Row
+		lastCol := oWorkbook.Sheets(sheet).Cells.Find("*", , , , xlByColumns, xlPrevious).Column
 
 		return {row: lastRow, column: lastCol}
 	}
