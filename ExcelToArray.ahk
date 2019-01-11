@@ -45,7 +45,7 @@ class ExcelToArray
 		Loop, % xls.WorkBooks.Count
 		{
 			if ( xls.WorkBooks(A_Index).FullName = fPath )
-			Return xls.WorkBooks(A_Index)
+				return xls.WorkBooks(A_Index)
 		}
 	}
 
@@ -56,13 +56,14 @@ class ExcelToArray
 		rowCount := SafeArr.MaxIndex(1)
 		colCount := SafeArr.MaxIndex(2)
 
-		Loop, % rowCount {
+		Loop, % rowCount
+		{
 			row := A_Index
 
 			arr := []
-			Loop, % colCount {
+			Loop, % colCount
 				arr.push( SafeArr[row, A_Index] )
-			}
+
 			ret.push(arr)
 		}
 
