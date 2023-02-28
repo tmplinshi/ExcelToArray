@@ -1,4 +1,4 @@
-﻿; v1.1 (2018-7-19)
+; v1.1 (2018-7-19)
 ; https://github.com/tmplinshi/ExcelToArray
 
 ExcelToArray(FileName, nSheet := 1, last_row := "", last_column := "")
@@ -20,13 +20,13 @@ class ExcelToArray
 
 	GetSafeArrFromXlFile(FileName, nSheet := 1, last_row := "", last_column := "")
 	{
+		static xlObj := ComObjCreate("Excel.Application")
 		fPath := this.GetFullPath(FileName)
 
 		if this.IsFileInUse(fPath) {
 			try wb := this.GetWorkbook(fpath)
 		}
 		if !wb {
-			xlObj := ComObjCreate("Excel.Application")
 			xlObj.Workbooks.Open(fPath)
 			wb := xlObj.ActiveWorkbook
 		}
